@@ -44,16 +44,56 @@ class DiscordRegistry
     end
   end
 
+  def assign_role(username, role_name)
+    role_id = role_id_from_name(role_name)
+    member = member_from_username(username)
+    user_id = id_from_username(username)
+
+    Discordrb::API::Channel.create_message(
+      bot_token,
+      updates_channel_id,
+      ":white_check_mark: Adding <@&#{role_id}> to <@#{user_id}>"
+    )
+
+    Discordrb::API::Server.add_member_role(
+      bot_token,
+      DISCORD_SERVER_ID,
+      user_id,
+      role_id,
+      reason="updated from sync_crafters_roles.rb"
+    )
+  end
+
   private 
+
+  def updates_channel_id
+    return @updates_channel_id if @updates_channel_id
+
+    channels_resp = Discordrb::API::Server.channels(bot_token, DISCORD_SERVER_ID)
+    channels = JSON.parse(channels_resp)
+    @updates_channel_id = channels.find { |channel| channel["name"] == "role-updates" }["id"]
+  end
 
   def role_name_from_id(role_id)
     role_ids_to_names.fetch(role_id)
+  end
+
+  def role_id_from_name(role_name)
+    role_names_to_ids.fetch(role_name)
+  end
+
+  def role_names_to_ids
+    role_ids_to_names.to_a.map(&:reverse).to_h
   end
 
   def role_ids_to_names
     @role_ids_to_names ||= JSON.parse(Discordrb::API::Server.roles(bot_token, DISCORD_SERVER_ID))
                              .map { |role| [role["id"], role["name"]] }
                              .to_h
+  end
+
+  def id_from_username(username)
+    member_from_username(username)["id"]
   end
 
   def member_from_username(username)
@@ -97,8 +137,6 @@ end
 
 class DiscordRoleSyncer
   def sync
-    puts "Updates channel ID: #{updates_channel_id}"
-
     user_profiles.each do |user_profile| 
       role_conditions.each do |role_name, condition| 
         role_should_exist = condition.call(user_profile)
@@ -118,6 +156,7 @@ class DiscordRoleSyncer
 
         if role_should_exist and !existing_roles.include?(role_name)
           puts "Assigning #{role_name} to #{discord_username} (GH: #{github_username})"
+          discord_registry.assign_role(discord_username, role_name)
         end
       end
     end
@@ -135,15 +174,6 @@ class DiscordRoleSyncer
       "Docker Crafter" => ->(u) { u.has_completed_challenge?("docker") },
       "Multi Crafter" => ->(u) { u.completed_challenges.count > 1 }
     }
-  end
-
-  def updates_channel_id
-    return @updates_channel_id if @updates_channel_id
-
-    bot = Discordrb::Bot.new(token: ENV.fetch("DISCORD_BOT_TOKEN"))
-    channels_resp = Discordrb::API::Server.channels(bot.token, DISCORD_SERVER_ID)
-    channels = JSON.parse(channels_resp)
-    @updates_channel_id = channels.find { |channel| channel["name"] == "role-updates" }["id"]
   end
 
   def user_profiles
