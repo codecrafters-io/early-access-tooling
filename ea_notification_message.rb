@@ -13,23 +13,19 @@ channel_id = channels.find { |channel| channel["name"] == channel_name}["id"]
 
 messages_resp = Discordrb::API::Channel.messages(bot.token, channel_id, 100)
 message = JSON.parse(messages_resp).last
-# puts <<~EOF
-
-#   Found message:
-
-#   > #{message.fetch("content")}
-
-# EOF
-
 message_id = message.fetch("id")
 
 reactions_resp = Discordrb::API::Channel.get_reactions(bot.token, channel_id, message_id, "👍")
 users = JSON.parse(reactions_resp)
 message = users
-            .map { |user| "@#{user.fetch("username")}##{user.fetch("discriminator")}" }
+            .map { |user| "<@#{user.fetch("id")}>" }
             .join(" ")
 
-# puts ""
-# puts "Message:"
-# puts ""
-puts message
+puts "Found #{users.count} user(s) to notify. Proceed?"
+STDIN.gets
+
+Discordrb::API::Channel.create_message(
+  bot.token,
+  channel_id,
+  message,
+)
