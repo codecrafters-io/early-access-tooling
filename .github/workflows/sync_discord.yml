@@ -1,4 +1,4 @@
-name: Sync Discord Rules
+name: Sync Discord Roles
 
 on:
   # Trigger on push 
@@ -14,6 +14,7 @@ jobs:
     name: Sync discord rules
     runs-on: ubuntu-latest
     steps:
+      - run: gem install bundler
       - run: bundle install --verbose
       - run: make sync_roles
         env:
