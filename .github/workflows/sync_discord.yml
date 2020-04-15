@@ -1,0 +1,20 @@
+name: Sync Discord Rules
+
+on:
+  # Trigger on push 
+  push:
+    branches: master
+
+  # Run hourly
+  schedule:
+    - cron: '0 * * * *'
+
+jobs:
+  build:
+    name: Sync discord rules
+    runs-on: ubuntu-latest
+    steps:
+      - run: bundle install --verbose
+      - run: make sync_roles
+        env:
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
