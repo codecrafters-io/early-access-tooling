@@ -38,6 +38,10 @@ class CodecraftersRegistry
 end
 
 class DiscordRegistry
+  def exists?(username)
+    !!member_from_username(username)
+  end
+
   def roles(username)
     member_from_username(username)["role_ids"].map do |role_id| 
       role_name_from_id(role_id)
@@ -148,8 +152,12 @@ class DiscordRoleSyncer
           next
         end
 
-        existing_roles = discord_registry.roles(discord_username)
+        unless discord_registry.exists?(discord_username)
+          puts "skip: #{github_username}, not on discord anymore"
+          next
+        end
 
+        existing_roles = discord_registry.roles(discord_username)
         if !role_should_exist and existing_roles.include?(role_name)
           puts "WARNING: Found #{role_name} assigned to #{discord_username}, but didn't expect it"
         end
