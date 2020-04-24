@@ -15,7 +15,7 @@ messages_resp = Discordrb::API::Channel.messages(bot.token, channel_id, 100)
 message = JSON.parse(messages_resp).last
 message_id = message.fetch("id")
 
-reactions_resp = Discordrb::API::Channel.get_reactions(bot.token, channel_id, message_id, "👍")
+reactions_resp = Discordrb::API::Channel.get_reactions(bot.token, channel_id, message_id, "👍", nil, nil, 100)
 users = JSON.parse(reactions_resp)
 message = users
             .map { |user| "<@#{user.fetch("id")}>" }
@@ -29,3 +29,5 @@ Discordrb::API::Channel.create_message(
   channel_id,
   message,
 )
+
+puts "Notification sent."

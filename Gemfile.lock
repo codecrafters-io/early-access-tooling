@@ -1,3 +1,16 @@
+GIT
+  remote: https://github.com/discordrb/discordrb
+  revision: 44f93948a812e06b439968c6b072c0d9b749a842
+  specs:
+    discordrb (3.3.0)
+      discordrb-webhooks (~> 3.3.0)
+      ffi (>= 1.9.24)
+      opus-ruby
+      rest-client (>= 2.0.0)
+      websocket-client-simple (>= 0.3.0)
+    discordrb-webhooks (3.3.0)
+      rest-client (>= 2.1.0.rc1)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -7,15 +20,6 @@ GEM
     backport (1.1.2)
     benchmark (0.1.0)
     coderay (1.1.2)
-    discordrb (3.3.0)
-      discordrb-webhooks (~> 3.3.0)
-      ffi (>= 1.9.24)
-      opus-ruby
-      rbnacl (~> 3.4.0)
-      rest-client (>= 2.1.0.rc1)
-      websocket-client-simple (>= 0.3.0)
-    discordrb-webhooks (3.3.0)
-      rest-client (>= 2.1.0.rc1)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
     e2mmap (0.1.0)
@@ -62,8 +66,6 @@ GEM
     public_suffix (4.0.4)
     rainbow (3.0.0)
     rake (13.0.1)
-    rbnacl (3.4.0)
-      ffi
     rest-client (2.1.0)
       http-accept (>= 1.7.0, < 2.0)
       http-cookie (>= 1.0.2, < 2.0)
@@ -114,7 +116,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  discordrb
+  discordrb!
   http
   octokit
   pry
