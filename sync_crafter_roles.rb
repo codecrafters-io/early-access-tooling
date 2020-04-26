@@ -9,6 +9,7 @@ require "yaml"
 
 DISCORD_SERVER_ID = "673463293901537291"
 TOTAL_CHALLENGES_COUNT = 3
+REALLY_SYNC = ENV.fetch("REALLY_SYNC", "false") == "true"
 
 class UserProfile
   def initialize(user_profile_hash)
@@ -53,6 +54,11 @@ class DiscordRegistry
     role_id = role_id_from_name(role_name)
     member = member_from_username(username)
     user_id = id_from_username(username)
+
+    unless REALLY_SYNC
+      puts "dry_run: Adding #{role_name} to #{username}"
+      return
+    end
 
     Discordrb::API::Channel.create_message(
       bot_token,
