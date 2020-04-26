@@ -8,6 +8,7 @@ require "json"
 require "yaml"
 
 DISCORD_SERVER_ID = "673463293901537291"
+TOTAL_CHALLENGES_COUNT = 3
 
 class UserProfile
   def initialize(user_profile_hash)
@@ -181,6 +182,8 @@ class DiscordRoleSyncer
       "Redis Crafter" => ->(u) { u.has_completed_challenge?("redis") },
       "Docker Crafter" => ->(u) { u.has_completed_challenge?("docker") },
       "Multi Crafter" => ->(u) { u.completed_challenges.count > 1 }
+      # TODO: Work on 'unsyncing' this?
+      "Master Crafter" => ->(u) { u.completed_challenges.count >= TOTAL_CHALLENGES_COUNT }
     }
   end
 
