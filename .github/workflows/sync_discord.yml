@@ -1,7 +1,7 @@
 name: Sync Discord Roles
 
 on:
-  # Trigger on push 
+  # Trigger on push
   push:
     branches: master
 
@@ -21,3 +21,4 @@ jobs:
       - run: make sync_roles
         env:
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          REALLY_SYNC: true
