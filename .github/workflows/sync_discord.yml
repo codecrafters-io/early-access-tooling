@@ -20,5 +20,6 @@ jobs:
       - run: bundle install --verbose
       - run: make sync_roles
         env:
+          GITHUB_TOKEN: ${{ secrets.CODECRAFTERS_BOT_GITHUB_TOKEN }}
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
           REALLY_SYNC: true

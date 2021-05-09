@@ -45,7 +45,7 @@ class DiscordRegistry
   end
 
   def roles(username)
-    member_from_username(username)["role_ids"].map do |role_id| 
+    member_from_username(username)["role_ids"].map do |role_id|
       role_name_from_id(role_id)
     end
   end
@@ -75,7 +75,7 @@ class DiscordRegistry
     )
   end
 
-  private 
+  private
 
   def updates_channel_id
     return @updates_channel_id if @updates_channel_id
@@ -148,8 +148,8 @@ end
 
 class DiscordRoleSyncer
   def sync
-    user_profiles.each do |user_profile| 
-      role_conditions.each do |role_name, condition| 
+    user_profiles.each do |user_profile|
+      role_conditions.each do |role_name, condition|
         role_should_exist = condition.call(user_profile)
 
         github_username = user_profile.github_username
@@ -177,7 +177,7 @@ class DiscordRoleSyncer
     end
   end
 
-  private 
+  private
 
   def discord_registry
     @discord_registry ||= DiscordRegistry.new
@@ -216,7 +216,7 @@ class DiscordRoleSyncer
   end
 
   def download_from_github(path)
-    url = Octokit.contents("codecrafters-io/alpha-landing", path: path).download_url
+    url = Octokit::Client.new(access_token: ENV.fetch("GITHUB_TOKEN")).contents("codecrafters-io/alpha-landing", path: path).download_url
     HTTP.get(url).to_s
   end
 end
