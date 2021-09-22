@@ -34,6 +34,10 @@ class UserProfile
   def has_completed_challenge?(challenge)
     completed_challenges.include?(challenge)
   end
+
+  def has_completed_challenges?(*challenges)
+    challenges.all? { |challenge| self.has_completed_challenge?(challenge) }
+  end
 end
 
 class CodecraftersRegistry
@@ -149,20 +153,21 @@ end
 class DiscordRoleSyncer
   def sync
     user_profiles.each do |user_profile|
+      github_username = user_profile.github_username
+      discord_username = github_discord_mapping[github_username]
+
+      if discord_username.nil?
+        puts "skip: #{github_username}, no discord mapping"
+        next
+      end
+
+      unless discord_registry.exists?(discord_username)
+        puts "skip: #{github_username}, not on discord anymore"
+        next
+      end
+
       role_conditions.each do |role_name, condition|
         role_should_exist = condition.call(user_profile)
-
-        github_username = user_profile.github_username
-        discord_username = github_discord_mapping[github_username]
-        if discord_username.nil?
-          puts "skip: #{github_username}, no discord mapping"
-          next
-        end
-
-        unless discord_registry.exists?(discord_username)
-          puts "skip: #{github_username}, not on discord anymore"
-          next
-        end
 
         existing_roles = discord_registry.roles(discord_username)
         if !role_should_exist and existing_roles.include?(role_name)
@@ -188,9 +193,11 @@ class DiscordRoleSyncer
       "Redis Crafter" => ->(u) { u.has_completed_challenge?("redis") },
       "Docker Crafter" => ->(u) { u.has_completed_challenge?("docker") },
       "Git Crafter" => ->(u) { u.has_completed_challenge?("git") },
+      "SQLite Crafter" => ->(u) { u.has_completed_challenge?("sqlite") },
       "Multi Crafter" => ->(u) { u.completed_challenges.count > 1 },
+
       # TODO: Work on 'unsyncing' this?
-      "Master Crafter" => ->(u) { u.completed_challenges.count >= TOTAL_CHALLENGES_COUNT }
+      "Master Crafter" => ->(u) { u.has_completed_challenges?("redis", "docker", "git") }
     }
   end
 
